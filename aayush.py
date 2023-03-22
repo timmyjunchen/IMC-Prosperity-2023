@@ -1,6 +1,25 @@
-from typing import Dict, List
-from datamodel import OrderDepth, TradingState, Order
+import json
+from typing import Any
 import pandas as pd
+from datamodel import Order, OrderDepth, TradingState, ProsperityEncoder, Symbol
+
+class Logger:
+    def __init__(self) -> None:
+        self.logs = ""
+
+    def print(self, *objects: Any, sep: str = " ", end: str = "\n") -> None:
+        self.logs += sep.join(map(str, objects)) + end
+
+    def flush(self, state: TradingState, orders: dict[Symbol, list[Order]]) -> None:
+        print(json.dumps({
+            "state": state,
+            "orders": orders,
+            "logs": self.logs,
+        }, cls=ProsperityEncoder, separators=(",", ":"), sort_keys=True))
+
+        self.logs = ""
+
+logger = Logger()
 
 class Trader:
     
@@ -21,13 +40,13 @@ class Trader:
     def run(self, state: TradingState) -> Dict[str, List[Order]]:
         result = {}
         for product in state.order_depths.keys():
-            if product.lower() == 'bananas':
+            if product == 'BANANAS':
                 orders: list[Order] = []
                 # Get trades from last trading state and add it to prev_market_trade_prices list
                 trade_price = []
                 
-                for i in state.market_trades[product]:
-                    trade_price.append(i.price())
+                for i in state.market_trades.get('BANANAS'):
+                    trade_price.append(i.price)
                 
                 # Calculate average of prices in last cycle
                 prev_prices_avg =  pd.Series(trade_price).mean()
@@ -39,23 +58,23 @@ class Trader:
                 if (prev_prices_avg > BOLU):
                     # Sell whatever products we have (may not be fulfilled)
                     # Sell the products at BOLU
-                    orders.append(Order(product, BOLU, -20))
+                    orders.append(Order('BANANAS', BOLU, -20))
                 elif (prev_prices_avg < BOLD):
                     # Buy whatever products are available (if there are any) below BOLD
-                    orders.append(Order(product, BOLD, 20))
+                    orders.append(Order('BANANAS', BOLD, 20))
                 
                 # Pop first value and add new value to end
                 self.next_banana_iteration(prev_prices_avg)
                 # Add all the above orders to the result dict
-                result[product] = orders
+                result['BANANAS'] = orders
             
-            if product.lower() == 'pearls':
+            if product == 'PEARLS':
                 orders: list[Order] = []
                 # Get trades from last trading state and add it to prev_market_trade_prices list
                 trade_price = []
                 
-                for i in state.market_trades[product]:
-                    trade_price.append(i.price())
+                for i in state.market_trades.get('PEARLS'):
+                    trade_price.append(i.price)
                 
                 # Calculate average of prices in last cycle
                 prev_prices_avg =  pd.Series(trade_price).mean()
@@ -67,14 +86,15 @@ class Trader:
                 if (prev_prices_avg > BOLU):
                     # Sell whatever products we have (may not be fulfilled)
                     # Sell the products at BOLU
-                    orders.append(Order(product, BOLU, -20))
+                    orders.append(Order('PEARLS', BOLU, -20))
                 elif (prev_prices_avg < BOLD):
                     # Buy whatever products are available (if there are any) below BOLD
-                    orders.append(Order(product, BOLD, 20))
+                    orders.append(Order('PEARLS', BOLD, 20))
                 
                 # Pop first value and add new value to end
                 self.next_pearl_iteration(prev_prices_avg)
                 # Add all the above orders to the result dict
-                result[product] = orders
+                result['PEARLS'] = orders
 
+        logger.flush(state, orders)
         return result
