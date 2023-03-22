@@ -1,10 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-<<<<<<< HEAD
-# 61bcb8fd-1630-46c2-857a-db3d51ac73e0.csv
-df = pd.read_csv('61bcb8fd-1630-46c2-857a-db3d51ac73e0.csv', sep = ';')
-=======
 
 
 # df = pd.read_csv('61bcb8fd-1630-46c2-857a-db3d51ac73e0.csv', sep = ';')
@@ -20,7 +16,6 @@ df_day2['timestamp'] = df_day2['timestamp'] + 2 * 999900
 df = pd.concat([df_day0, df_day1, df_day2], axis=0)
 # df.to_csv("final.csv",index=False)
 
->>>>>>> 9099e95b1d867c98ff0b1358fe1032c7b037b651
 x = df[df['product'] == 'BANANAS']['timestamp']
 y = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 50).mean()
 std = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 50).std()
@@ -36,11 +31,12 @@ plt.plot(x, BOLD)
 #print(BOLU[len(BOLU)-2])
 #BOLD = BOLD.reset_index()
 #print(BOLD['mid_price'][len(BOLD['mid_price']) - 1])
-y = df[df['product'] == 'BANANAS']['mid_price']
-y = y.reset_index()
-print(list(y['mid_price'][len(y) - 50:len(y)]))
-y = df[df['product'] == 'PEARLS']['mid_price']
-y = y.reset_index()
-print(list(y['mid_price'][len(y) - 50:len(y)]))
+# y = df[df['product'] == 'BANANAS']['mid_price']
+# y = y.reset_index()
+# print(list(y['mid_price'][len(y) - 50:len(y)]))
+# y = df[df['product'] == 'PEARLS']['mid_price']
+# y = y.reset_index()
+# print(list(y['mid_price'][len(y) - 50:len(y)]))
 
-print()
+BOLU = BOLU.reset_index()
+print(BOLU)
