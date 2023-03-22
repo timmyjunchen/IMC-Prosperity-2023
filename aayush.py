@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import *
 import pandas as pd
 from datamodel import Order, OrderDepth, TradingState, ProsperityEncoder, Symbol
 
@@ -45,6 +45,9 @@ class Trader:
                 # Get trades from last trading state and add it to prev_market_trade_prices list
                 trade_price = []
                 
+                if state.market_trades.get('BANANAS') is None:
+                    continue
+                
                 for i in state.market_trades.get('BANANAS'):
                     trade_price.append(i.price)
                 
@@ -52,8 +55,8 @@ class Trader:
                 prev_prices_avg =  pd.Series(trade_price).mean()
 
                 bananas_series = pd.Series(self.bananas)
-                BOLU = 1.5 * bananas_series.std() + bananas_series.mean()
-                BOLD = bananas_series.mean() - 1.5 * bananas_series.std()
+                BOLU = 1.75 * bananas_series.std() + bananas_series.mean()
+                BOLD = bananas_series.mean() - 1.75 * bananas_series.std()
                 
                 if (prev_prices_avg > BOLU):
                     # Sell whatever products we have (may not be fulfilled)
@@ -73,6 +76,9 @@ class Trader:
                 # Get trades from last trading state and add it to prev_market_trade_prices list
                 trade_price = []
                 
+                if state.market_trades.get('PEARLS') is None:
+                    continue
+                
                 for i in state.market_trades.get('PEARLS'):
                     trade_price.append(i.price)
                 
@@ -80,8 +86,8 @@ class Trader:
                 prev_prices_avg =  pd.Series(trade_price).mean()
 
                 pearl_series = pd.Series(self.pearls)
-                BOLU = 2 * pearl_series.std() + pearl_series.mean()
-                BOLD = pearl_series.mean() - 2 * pearl_series.std()
+                BOLU = 0.5 * pearl_series.std() + pearl_series.mean()
+                BOLD = pearl_series.mean() - 0.5 * pearl_series.std()
                 
                 if (prev_prices_avg > BOLU):
                     # Sell whatever products we have (may not be fulfilled)
