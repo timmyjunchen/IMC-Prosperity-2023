@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
+# 61bcb8fd-1630-46c2-857a-db3d51ac73e0.csv
 df = pd.read_csv('61bcb8fd-1630-46c2-857a-db3d51ac73e0.csv', sep = ';')
 x = df[df['product'] == 'BANANAS']['timestamp']
 y = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 100).mean()
