@@ -17,8 +17,8 @@ df = pd.concat([df_day0, df_day1, df_day2], axis=0)
 # df.to_csv("final.csv",index=False)
 
 x = df[df['product'] == 'BANANAS']['timestamp']
-y = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 100).mean()
-std = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 100).std()
+y = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 50).mean()
+std = df[df['product'] == 'BANANAS']['mid_price'].rolling(window = 50).std()
 BOLU = y + 2 * std
 BOLD = y - 2 * std
 
@@ -26,7 +26,16 @@ plt.plot(x, df[df['product'] == 'BANANAS']['mid_price'], color = 'r')
 #plt.plot(x, y)
 plt.plot(x, BOLU)
 plt.plot(x, BOLD)
-plt.show()
+#plt.show()
 
-print(BOLU[len(BOLU)-1])
-print(BOLD[len(BOLD)-1])
+#print(BOLU[len(BOLU)-2])
+#BOLD = BOLD.reset_index()
+#print(BOLD['mid_price'][len(BOLD['mid_price']) - 1])
+y = df[df['product'] == 'BANANAS']['mid_price']
+y = y.reset_index()
+print(list(y['mid_price'][len(y) - 50:len(y)]))
+y = df[df['product'] == 'PEARLS']['mid_price']
+y = y.reset_index()
+print(list(y['mid_price'][len(y) - 50:len(y)]))
+
+print()
