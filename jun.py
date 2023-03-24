@@ -51,7 +51,7 @@ class Trader:
                 # Calculate average of prices in last cycle
                 prev_prices_avg =  pd.Series(trade_price).mean()
 
-                print('Banana price: ' + prev_prices_avg)
+                # print('Banana price: ' + str(prev_prices_avg))
 
                 bananas_series = pd.Series(self.bananas)
                 exp1_bananas = bananas_series.ewm(span=12, adjust=False).mean()
@@ -61,16 +61,17 @@ class Trader:
                 signal = pd.DataFrame(macd_bananas.ewm(span=9, adjust = False).mean()).rename(columns={'macd':'signal'})
 
                 df = pd.concat([macd_bananas, signal], axis = 1)
-                indicator = df['macd_bananas'] - df['signal']
-                indicator = indicator.reset_index()
-                last_val = indicator[0][len(indicator) - 1]
+                if (df.get('macd_bananas') is not None) and (df.get('signal') is not None):
+                    indicator = df.get('macd_bananas') - df.get('signal')
+                    indicator = indicator.reset_index()
+                    last_val = indicator.get(0).get(len(indicator) - 1)
 
-                if (last_val < 0):
-                    # Sell whatever products we have (may not be fulfilled)
-                    orders.append(Order('prev', prev_prices_avg, -20))
-                elif (last_val > 0):
-                    # Buy whatever products are available (if there are any)
-                    orders.append(Order('BANANAS', prev_prices_avg, 20))
+                    if (last_val < 0):
+                        # Sell whatever products we have (may not be fulfilled)
+                        orders.append(Order('BANANAS', prev_prices_avg, -20))
+                    elif (last_val > 0):
+                        # Buy whatever products are available (if there are any)
+                        orders.append(Order('BANANAS', prev_prices_avg, 20))
                 
                 # Pop first value and add new value to end
                 self.next_banana_iteration(prev_prices_avg)

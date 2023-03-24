@@ -67,7 +67,7 @@ class Trader:
 
                 if (last_val < 0):
                     # Sell whatever products we have (may not be fulfilled)
-                    orders.append(Order('prev', prev_prices_avg, -20))
+                    orders.append(Order('BANANAS', prev_prices_avg, -20))
                 elif (last_val > 0):
                     # Buy whatever products are available (if there are any)
                     orders.append(Order('BANANAS', prev_prices_avg, 20))
@@ -77,68 +77,7 @@ class Trader:
                 # Add all the above orders to the result dict
                 result['BANANAS'] = orders
             
-            # if product == 'PEARLS':
-            #     orders: list[Order] = []
-            #     # Get trades from last trading state and add it to prev_market_trade_prices list
-            #     trade_price = []
-                
-            #     for i in state.market_trades.get('PEARLS'):
-            #         trade_price.append(i.price)
-                
-            #     # Calculate average of prices in last cycle
-            #     prev_prices_avg =  pd.Series(trade_price).mean()
-
-            #     print('Pearl price: ' + prev_prices_avg)
-
-            #     pearl_series = pd.Series(self.pearls)
-            #     BOLU = 0.5 * pearl_series.std() + pearl_series.mean()
-            #     BOLD = pearl_series.mean() - 0.5 * pearl_series.std()
-                
-            #     if (prev_prices_avg > BOLU):
-            #         # Sell whatever products we have (may not be fulfilled)
-            #         # Sell the products at BOLU
-            #         orders.append(Order('PEARLS', BOLU, -20))
-            #     elif (prev_prices_avg < BOLD):
-            #         # Buy whatever products are available (if there are any) below BOLD
-            #         orders.append(Order('PEARLS', BOLD, 20))
-                
-            #     # Pop first value and add new value to end
-            #     self.next_pearl_iteration(prev_prices_avg)
-            #     # Add all the above orders to the result dict
-            #     result['PEARLS'] = orders
-
-        logger.flush(state, orders)
-        return result
-
-# def dumb_punting_algorithm():
-    # for product in state.order_depths.keys():
-    #     if a.product.lower() == 'pearls':
-    #         prev_price = a.state.market_trades[product][-2].price()
-    #         now_price = a.state.market_trades[product][-1].price()
-    #         if now_price < prev_price:
-    #             best_ask = min(a.order_depth.sell_orders.keys())
-    #             best_ask_volume = a.order_depth.sell_orders[best_ask]
-    #             if (best_ask < prev_price):
-    #                 a.orders.append(a.Order(product, best_ask, -best_ask_volume))
-    #         elif now_price > prev_price:
-    #             best_bid = max(a.order_depth.buy_orders.keys())
-    #             best_bid_volume = a.order_depth.buy_orders[best_bid]
-    #             if best_bid > prev_price:
-    #                 a.orders.append(a.Order(product, best_bid, best_bid_volume))
-    #     if a.product.lower() == 'bananas':
-    #         prev_price = a.state.market_trades[product][-2].price()
-    #         now_price = a.state.market_trades[product][-1].price()
-    #         if now_price < prev_price:
-    #             best_ask = min(a.order_depth.sell_orders.keys())
-    #             best_ask_volume = a.order_depth.sell_orders[best_ask]
-    #             if (best_ask < prev_price):
-    #                 a.orders.append(a.Order(product, best_ask, -best_ask_volume))
-    #         elif now_price > prev_price:
-    #             best_bid = max(a.order_depth.buy_orders.keys())
-    #             best_bid_volume = a.order_depth.buy_orders[best_bid]
-    #             if best_bid > prev_price:
-    #                 a.orders.append(a.Order(product, best_bid, best_bid_volume))
-    #     return a.orders
+            
 
 # def round_1():
 
@@ -167,27 +106,22 @@ class Trader:
 
     # plt.show()
 
-def round_2():
+df_day0 = pd.read_csv('./island-data-bottle-round-1/prices_round_1_day_-2.csv', sep = ';')
+df_day1 = pd.read_csv('./island-data-bottle-round-1/prices_round_1_day_-1.csv', sep = ';')
+df_day2 = pd.read_csv('./island-data-bottle-round-1/prices_round_1_day_0.csv', sep = ';')
 
-    df_day0 = pd.read_csv('./island-data-bottle-round-1/prices_round_1_day_-2.csv', sep = ';')
-    df_day1 = pd.read_csv('./island-data-bottle-round-1/prices_round_1_day_-1.csv', sep = ';')
-    df_day2 = pd.read_csv('./island-data-bottle-round-1/prices_round_1_day_0.csv', sep = ';')
+df_day1['timestamp'] = df_day1['timestamp'] + 999900
+df_day2['timestamp'] = df_day2['timestamp'] + 2 * 999900
 
-    df_day1['timestamp'] = df_day1['timestamp'] + 999900
-    df_day2['timestamp'] = df_day2['timestamp'] + 2 * 999900
+df = pd.concat([df_day0, df_day1, df_day2], axis=0)
+bananas = df[df['product'] == 'BANANAS']['mid_price']
 
-    df = pd.concat([df_day0, df_day1, df_day2], axis=0)
-    bananas = df[df['product'] == 'BANANAS']['mid_price']
+exp1_bananas = bananas.ewm(span=12, adjust=False).mean()
+exp2_bananas = bananas.ewm(span=26, adjust=False).mean()
+macd_bananas = pd.DataFrame(exp1_bananas - exp2_bananas).rename(columns = {'mid_price': 'macd'})
+signal = pd.DataFrame(macd_bananas.ewm(span=9, adjust = False).mean()).rename(columns={'macd':'signal'})
 
-    exp1_bananas = bananas.ewm(span=12, adjust=False).mean()
-    exp2_bananas = bananas.ewm(span=26, adjust=False).mean()
-    macd_bananas = pd.DataFrame(exp1_bananas - exp2_bananas).rename(columns = {'mid_price': 'macd'})
-    signal = pd.DataFrame(macd_bananas.ewm(span=9, adjust = False).mean()).rename(columns={'macd':'signal'})
-
-    df_new = pd.concat([macd_bananas, signal], axis = 1)
-    buy = df_new['macd'] - df_new['signal']
-    buy = buy.reset_index()
-    print(buy)
-    print(buy[0][len(buy) - 1])
-
-round_2()
+df_new = pd.concat([macd_bananas, signal], axis = 1)
+buy = df_new['macd'] - df_new['signal']
+buy = buy.reset_index()
+print(buy[0][len(buy) - 1])
