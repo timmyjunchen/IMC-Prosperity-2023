@@ -45,9 +45,6 @@ class Trader:
                 # Get trades from last trading state and add it to prev_market_trade_prices list
                 trade_price = []
                 
-                if state.market_trades.get('BANANAS') is None:
-                    continue
-                
                 for i in state.market_trades.get('BANANAS'):
                     trade_price.append(i.price)
                 
@@ -57,8 +54,8 @@ class Trader:
                 print('Banana price: ' + prev_prices_avg)
 
                 bananas_series = pd.Series(self.bananas)
-                BOLU = 1.75 * bananas_series.std() + bananas_series.mean()
-                BOLD = bananas_series.mean() - 1.75 * bananas_series.std()
+                BOLU = 1.5 * bananas_series.std() + bananas_series.mean()
+                BOLD = bananas_series.mean() - 1.5 * bananas_series.std()
                 
                 if (prev_prices_avg > BOLU):
                     # Sell whatever products we have (may not be fulfilled)
@@ -77,9 +74,6 @@ class Trader:
                 orders: list[Order] = []
                 # Get trades from last trading state and add it to prev_market_trade_prices list
                 trade_price = []
-                
-                if state.market_trades.get('PEARLS') is None:
-                    continue
                 
                 for i in state.market_trades.get('PEARLS'):
                     trade_price.append(i.price)
