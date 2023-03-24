@@ -47,15 +47,39 @@ class Trader:
                 
                 for i in state.market_trades.get('BANANAS'):
                     trade_price.append(i.price)
+
+                buy_orders = state.order_depths.get('BANANAS').buy_orders
+                sell_orders = state.order_depths.get('BANANAS').sell_orders
+                if buy_orders is None or sell_orders is None:
+                    break
+
+                buy_keys = state.order_depths['BANANAS'].buy_orders.keys()
+                sell_keys = state.order_depths['BANANAS'].sell_orders.keys()
+
+                bid_max = 0
+                for i in buy_keys:
+                    if i > bid_max:
+                        bid_max = i
+
+                ask_min = 1000000
+                for i in sell_keys:
+                    if i < ask_min:
+                        ask_min = i
                 
                 # Calculate average of prices in last cycle
-                prev_prices_avg =  pd.Series(trade_price).mean()
+                prev_prices_avg =  (bid_max + ask_min)/2
 
-                print('Banana price: ' + prev_prices_avg)
+                if bid_max == 0 and ask_min == 1000000:
+                    prev_prices_avg = self.bananas[-1]
+
+                print('Banana price: ' + str(prev_prices_avg))
 
                 bananas_series = pd.Series(self.bananas)
                 BOLU = 1.5 * bananas_series.std() + bananas_series.mean()
                 BOLD = bananas_series.mean() - 1.5 * bananas_series.std()
+
+                print('Banana BOLU' + str(BOLU))
+                print('Banana BOLU' + str(BOLD))
                 
                 if (prev_prices_avg > BOLU):
                     # Sell whatever products we have (may not be fulfilled)
@@ -78,10 +102,31 @@ class Trader:
                 for i in state.market_trades.get('PEARLS'):
                     trade_price.append(i.price)
                 
-                # Calculate average of prices in last cycle
-                prev_prices_avg =  pd.Series(trade_price).mean()
+                buy_orders = state.order_depths.get('PEARLS').buy_orders
+                sell_orders = state.order_depths.get('PEARLS').sell_orders
+                if buy_orders is None or sell_orders is None:
+                    break
+                
+                buy_keys = state.order_depths['PEARLS'].buy_orders.keys()
+                sell_keys = state.order_depths['PEARLS'].sell_orders.keys()
+                
+                bid_max = 0
+                for i in buy_keys:
+                    if i > bid_max:
+                        bid_max = i
 
-                print('Pearl price: ' + prev_prices_avg)
+                ask_min = 1000000
+                for i in sell_keys:
+                    if i < ask_min:
+                        ask_min = i
+                
+                # Calculate average of prices in last cycle
+                prev_prices_avg =  (bid_max + ask_min)/2
+
+                if bid_max == 0 and ask_min == 1000000:
+                    prev_prices_avg = self.pearls[-1]
+
+                print('Pearl price: ' + str(prev_prices_avg))
 
                 pearl_series = pd.Series(self.pearls)
                 BOLU = 0.5 * pearl_series.std() + pearl_series.mean()
