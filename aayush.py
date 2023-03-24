@@ -54,6 +54,8 @@ class Trader:
                 # Calculate average of prices in last cycle
                 prev_prices_avg =  pd.Series(trade_price).mean()
 
+                print('Banana price: ' + prev_prices_avg)
+
                 bananas_series = pd.Series(self.bananas)
                 BOLU = 1.75 * bananas_series.std() + bananas_series.mean()
                 BOLD = bananas_series.mean() - 1.75 * bananas_series.std()
@@ -84,6 +86,8 @@ class Trader:
                 
                 # Calculate average of prices in last cycle
                 prev_prices_avg =  pd.Series(trade_price).mean()
+
+                print('Pearl price: ' + prev_prices_avg)
 
                 pearl_series = pd.Series(self.pearls)
                 BOLU = 0.5 * pearl_series.std() + pearl_series.mean()
